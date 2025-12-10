@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<!-- saved from url=(0042)file:///G:/ultimo%20intento/MACHSCAPS.HTML -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda de Gorras - Con Confirmación</title>
+
+    <!-- Tipos de letra -->
+    <link href="./CAPMUCH_files/css2" rel="stylesheet">
+   <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: linear-gradient(180deg,#0a0a0a,#272727);
+            font-family: "Lato", sans-serif;
+            color: white;
+            -webkit-font-smoothing:antialiased;
+        }
+
+        header {
+            background: #111;
+            padding: 18px 20px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            position:relative;
+        }
+        header h1 {
+            margin:0;
+            color:#ffcc00;
+            font-family:"Bebas Neue",sans-serif;
+            font-size:40px;
+            letter-spacing:2px;
+        }
+
+        /* Botón música (mute/unmute + play/pause) */
+        #btn-musica {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+            z-index:1300;
+        }
+
+        /* Botón asistente flotante (cerca del de música) */
+        #btn-asistente {
+            position: fixed;
+            right: 18px;
+            bottom: 76px; /* sobre el boton musica */
+            background: #111;
+            color: #fff;
+            border: 2px solid #ffcc00;
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+            z-index:1300;
+        }
+
+        /* Menu hamburguesa (top-right) */
+        #menu-toggle {
+            position: absolute;
+            right: 18px;
+            top: 14px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            z-index:1400;
+        }
+        #menu-panel {
+            position: absolute;
+            right: 18px;
+            top: 54px;
+            background: #111;
+            border: 1px solid #333;
+            padding:12px;
+            border-radius:8px;
+            display:none;
+            box-shadow:0 12px 30px rgba(0,0,0,0.6);
+            z-index:1400;
+        }
+        #menu-panel a { display:block; color:#ddd; text-decoration:none; margin:6px 0; }
+        #menu-panel .icon { width:18px; height:18px; vertical-align:middle; margin-right:8px; }
+
+        .subtitulo { text-align:center; color:#bbbbbb; font-family:"Poppins",sans-serif; font-size:15px; margin:10px 0 18px; }
+
+        /* filtros */
+        .filtros {
+            display:flex;
+            gap:12px;
+            justify-content:center;
+            align-items:center;
+            padding:0 16px;
+            margin-bottom:18px;
+            flex-wrap:wrap;
+        }
+        .filtros input, .filtros select {
+            padding:12px 14px;
+            border-radius:8px;
+            border:none;
+            background:#1a1a1a;
+            color:#ddd;
+            font-size:15px;
+            width:250px;
+        }
+        .filtros button {
+            padding:12px 14px;
+            border-radius:8px;
+            border:none;
+            background:#ffcc00;
+            color:#0a0a0a;
+            cursor:pointer;
+            font-weight:700;
+        }
+
+        /* Grid */
+        .grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+            gap:18px;
+            padding:16px;
+            max-width:1200px;
+            margin:0 auto;
+        }
+        .card {
+            background:rgba(255,255,255,0.04);
+            padding:14px;
+            border-radius:12px;
+            text-align:center;
+            transition:transform .18s, box-shadow .18s;
+            box-shadow:0 4px 20px rgba(0,0,0,0.6);
+        }
+        .card:hover{ transform:translateY(-6px); }
+        .img-gorra { width:100%; height:180px; border-radius:10px; margin-bottom:10px; object-fit:cover; background:#222; }
+        .titulo-gorra { font-family:"Bebas Neue",sans-serif; font-size:24px; margin:6px 0; color:red; }
+        .descripcion { font-size:13px; color:#dcdcdc; min-height:36px; }
+        .precio { font-size:18px; font-weight:700; color:#ffcc00; margin-top:8px; }
+        .btn-agregar {
+            margin-top:10px;
+            padding:10px 12px;
+            background:#ff4d4d;
+            color:#fff;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+            display:inline-flex;
+            gap:8px;
+            align-items:center;
+            justify-content:center;
+            font-weight:700;
+        }
+
+        /* Video */
+        .video-wrap { text-align:center; margin:28px 0; }
+        .video-wrap h2 { color:red; font-family:Arial, Helvetica, sans-serif; }
+
+        /* marcas */
+        .marcas { background:#1a1a1a; padding:18px; margin:18px auto; max-width:1200px; border-radius:8px; text-align:center; }
+        .marcas h2 { color:#ff5050; margin:0 0 8px 0; }
+        .marcas p { color:#eee; margin:2px 0; }
+
+        /* Sección mapa + texto (añadido) */
+        .map-wrap { max-width:1200px; margin:18px auto; display:flex; gap:18px; align-items:flex-start; padding:0 16px; }
+        .map-img { flex:1 1 520px; border-radius:8px; overflow:hidden; background:#3a3a3a; }
+        .map-img img { width:100%; display:block; }
+        .map-text { flex:1 1 420px; background:#0b0b0b; padding:28px; border-radius:8px; color:#fff; }
+        .map-text h2 { margin-top:0; color:#fff; font-family:"Bebas Neue",sans-serif; }
+        .map-text p { color:#ddd; }
+        .map-actions a { color:#ffcc00; display:inline-block; margin-top:12px; text-decoration:underline; }
+
+        /* carrito diseño similar foto */
+        .carrito-pago {
+            background:#111;
+            padding:20px;
+            margin:26px auto;
+            border-radius:10px;
+            max-width:820px;
+            color:#eee;
+            box-shadow:0 8px 30px rgba(0,0,0,0.6);
+        }
+        .carrito-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+        .carrito-header h2 { margin:0; color:#ffcc00; font-family:"Bebas Neue",sans-serif; font-size:26px; }
+
+        .carrito-items { max-height:220px; overflow:auto; padding:8px 0; border-bottom:1px solid #222; }
+        .carrito-empty { color:#888; padding:18px 0; border-bottom:1px solid #222; text-align:center; }
+
+        .carrito-item { display:flex; justify-content:space-between; align-items:center; padding:10px 6px; border-radius:6px; }
+        .carrito-item + .carrito-item { margin-top:6px; }
+        .carrito-item .nombre { color:#fff; }
+        .carrito-item .precio { color:#ffcc00; font-weight:700; margin-left:10px; }
+
+        .mini-btn {
+            background:#222;
+            border:1px solid #333;
+            color:#ddd;
+            padding:6px 8px;
+            border-radius:6px;
+            cursor:pointer;
+        }
+        .mini-btn svg { vertical-align: middle; }
+
+        .carrito-footer { display:flex; gap:18px; align-items:flex-start; justify-content:space-between; margin-top:14px; flex-wrap:wrap; }
+        .datos-pago { flex:1 1 380px; min-width:260px; }
+        .datos-pago h3 { color:red; margin:6px 0 10px; }
+        .datos-pago input { width:100%; padding:12px; margin:8px 0; border-radius:8px; border:none; background:#222; color:#ddd; font-size:15px; }
+
+        .resumen-pago { width:220px; min-width:160px; text-align:right; }
+        .resumen-pago .total-label { color:#ffcc00; font-weight:800; font-size:18px; }
+        .resumen-pago .total-amount { color:#ffcc00; font-weight:900; font-size:20px; margin-top:6px; }
+
+        .acciones-principales { display:flex; gap:12px; justify-content:flex-end; margin-top:12px; flex-wrap:wrap; }
+        .btn-vaciar { background:#ff4d4d; color:white; border:none; padding:12px 26px; border-radius:10px; cursor:pointer; font-weight:700; display:inline-flex; gap:8px; align-items:center; }
+        .btn-comprar { background:#ffcc00; color:#0a0a0a; border:none; padding:12px 26px; border-radius:10px; cursor:pointer; font-weight:800; display:inline-flex; gap:8px; align-items:center; }
+
+        #mensaje-exito { display:none; margin-top:10px; color:#45ff86; font-weight:700; text-align:center; padding:10px; border-radius:8px; background:rgba(69,255,134,0.05); }
+
+        footer { margin-top:30px; padding:20px; text-align:center; background:#0c0c0c; border-top:2px solid #ffcc00; color:#ccc; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset:0;
+            background: rgba(0,0,0,0.6);
+            display:none;
+            align-items:center;
+            justify-content:center;
+            z-index:1200;
+        }
+        .modal {
+            background:#0f0f0f;
+            border-radius:12px;
+            padding:18px;
+            max-width:560px;
+            width:94%;
+            color:#eee;
+            box-shadow:0 12px 40px rgba(0,0,0,0.7);
+        }
+        .modal h3 { margin:0 0 10px 0; color:#ffcc00; font-family:"Bebas Neue",sans-serif; }
+        .modal .lista-resumen { max-height:220px; overflow:auto; margin:8px 0; border-radius:6px; padding:6px; background:#111; }
+        .modal .fila { display:flex; justify-content:space-between; padding:8px; border-bottom:1px dashed #222; }
+        .modal .acciones { display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
+        .modal .btn { padding:10px 14px; border-radius:8px; cursor:pointer; border:none; font-weight:700; }
+        .btn-cancel { background:#333; color:#fff; }
+        .btn-confirm { background:#ffcc00; color:#000; }
+
+        /* Chat asistente */
+        .chat-panel { position: fixed; right: 18px; bottom: 140px; width:320px; max-width:92%; background:#0b0b0b; border-radius:10px; padding:12px; box-shadow:0 12px 40px rgba(0,0,0,0.7); display:none; z-index:1500; }
+        .chat-panel .messages { max-height:260px; overflow:auto; padding:6px; }
+        .chat-panel input { width:100%; padding:10px; margin-top:8px; border-radius:8px; border:none; background:#222; color:#ddd; }
+
+        @media (max-width:760px) {
+            .resumen-pago { width:100%; text-align:left; margin-top:12px; }
+            .carrito-footer { flex-direction:column; align-items:stretch; }
+            header h1 { font-size:30px; }
+            .titulo-gorra { font-size:20px; }
+            .map-wrap { flex-direction:column; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- AUDIO LOCAL (ruta original) -->
+  <audio id="musica" src="file:///G:/ultimo%20intento/Almighty%20-%20Guerra%20(Prod.%20King%20Swifft)%20[4JTLD76nSmk].mp3" loop="" controls=""></audio>
+
+<!-- BOTÓN MUTE/UNMUTE -->
+  <button id="btn-musica" title="Control de música" style="background: rgb(255, 77, 77);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 9v6h4l5 5V4l-5 5H9z"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg></button>
+<!-- BOTÓN ASISTENTE FLOTANTE -->
+    <button id="btn-asistente" title="Abrir asistente">💬</button>
+
+    <!-- MENU HAMBURGUESA (ARRIBA DERECHA) -->
+    <button id="menu-toggle" aria-expanded="false" title="Menú">
+        <!-- tres rayitas -->
+        <svg width="22" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round"></path></svg>
+    </button>
+    <div id="menu-panel" role="menu" aria-hidden="true" style="display: none;">
+        <strong style="color:#ffcc00; display:block; margin-bottom:8px;">Contacta</strong>
+        <!-- WhatsApp links for workers -->
+        <a href="https://wa.me/525616224689" target="_blank"><img class="icon" src="data:image/svg+xml;utf8,&lt;svg xmlns=&#39;http://www.w3.org/2000/svg&#39; width=&#39;18&#39; height=&#39;18&#39;&gt;&lt;text x=&#39;0&#39; y=&#39;14&#39; font-size=&#39;14&#39;&gt;%F0%9F%92%AC&lt;/text&gt;&lt;/svg&gt;">Martin Sanabria - WhatsApp</a>
+        <a href="https://wa.me/525637902886" target="_blank">Bayron Jose - WhatsApp</a>
+        <a href="https://wa.me/525563374484" target="_blank">Jessica Marlen - WhatsApp</a>
+        <a href="https://wa.me/525519831127" target="_blank">Angel Santiago - WhatsApp</a>
+        <a href="https://wa.me/525551724129" target="_blank">Mota Salinas - WhatsApp</a>
+        <hr style="border-color:#222;margin:8px 0;">
+        <strong style="color:#ffcc00; display:block; margin-bottom:8px;">Síguenos</strong>
+        <!-- Instagram links -->
+        <a href="https://www.instagram.com/mota_797?igsh=c3R3d29qZWJnd3Zt" target="_blank">Instagram Mota</a>
+        <a href="https://www.instagram.com/021202_jk?igsh=OHIwMXRqZHd0OHhu" target="_blank">Instagram Bayron</a>
+        <a href="https://www.instagram.com/martinn__933_?igsh=MW4zYWRmcG4xZTZxNw==" target="_blank">Instagram Martin</a>
+        <a href="https://www.instagram.com/marlencita_jm?igsh=ZjJjeDc5eHN4dXpm" target="_blank">Instagram Jesicca</a>
+        <a href="https://www.instagram.com/bodoque_.as?igsh=MTZuN3BwanRvaXJreQ==" target="_blank">Instagram Equipo</a>
+    </div>
+    <!-- HEADER -->
+    <header>
+        <h1>🔥 TIENDA DE GORRAS PREMIUM 🔥</h1>
+    </header>
+    <p class="subtitulo">Jordan – Mitchell &amp; Ness – Estilos exclusivos</p>
+
+    <!-- LOGO + TEXTO DE ENVIOS (debajo del logo, centrado) -->
+    <div style="text-align:center; margin-top:8px;">
+        <!-- imagenes subidas por el usuario (se usan rutas relativas si las subes al mismo servidor) -->
+        <img src="file:///G:/mnt/data/logo" alt="logo-etiqueta" style="height: 60px; display: none; margin-right: 12px;" onerror="this.style.display=&#39;none&#39;">
+        <img src="file:///G:/mnt/data/logo%20principal%20marca" alt="logo-nombre" style="height: 52px; display: none; vertical-align: middle;" onerror="this.style.display=&#39;none&#39;">
+        <div style="margin-top:8px; color:#ffcc00; font-weight:800;">ENVIOS A TODO MÉXICO</div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filtros">
+        <input id="busqueda" type="text" placeholder="Buscar gorra por nombre...">
+        <select id="filtro-marca">
+            <option value="todas">Todas las marcas</option>
+            <option value="jordan">Jordan</option>
+            <option value="mitchell&amp;ness">Mitchell &amp; Ness</option>
+            <option value="mitchell&amp;ness-street">Mitchell &amp; Ness Street</option>
+            <option value="newera">New Era</option>
+            <option value="supreme">Supreme</option>
+            <option value="adidas">Adidas</option>
+            <option value="nike">Nike</option>
+            <option value="overbrand">OverBrand</option>
+        </select>
+        <button id="btn-reset">Reset</button>
+    </div>
+
+    <!-- GRID PRODUCTOS -->
+    <div class="grid" id="grid-productos">
+
+        <div class="card" data-nombre="Gorra Jordan MVP" data-marca="jordan" data-precio="950">
+            <img class="img-gorra" src="./CAPMUCH_files/images.jpg" alt="Gorra Jordan MVP" onerror="fallbackImg(this,&#39;https://i.imgur.com/GdI5c6E.jpeg&#39;)">
+            <div class="titulo-gorra">Gorra Jordan MVP</div>
+            <div class="descripcion">Ajustable, ligera y con logo bordado premium.</div>
+            <div class="precio">$950 MXN</div>
+            <button class="btn-agregar">
+                <!-- carrito SVG -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61H19a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                AGREGAR AL CARRITO
+            </button>
+        </div>
+
+        <div class="card" data-nombre="Gorra Jordan Black Edition NBA" data-marca="jordan" data-precio="1200">
+            <img class="img-gorra" src="./CAPMUCH_files/gorra-jordan-u-j-pro-cap-s-fb-ssnl-negro-0.webp" alt="Jordan Black" onerror="fallbackImg(this,&#39;https://i.imgur.com/V2B2K3w.jpeg&#39;)">
+            <div class="titulo-gorra">Gorra Jordan Black Edition NBA</div>
+            <div class="descripcion">Modelo clásico con detalle Jumpman metálico.</div>
+            <div class="precio">$1200 MXN</div>
+            <button class="btn-agregar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61H19a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                AGREGAR AL CARRITO
+            </button>
+        </div>
+
+        <div class="card" data-nombre="Gorra Mitchell &amp; Ness NBA Elephant" data-marca="mitchell&amp;ness" data-precio="1650">
+            <img class="img-gorra" src="./CAPMUCH_files/download.jpg" alt="Mitchell &amp; Ness Elephant" onerror="fallbackImg(this,&#39;https://i.imgur.com/I6h4xVO.jpeg&#39;)">
+            <div class="titulo-gorra">Gorra Mitchell &amp; Ness NBA Elephant</div>
+            <div class="descripcion">Edición especial 2024 con bordado 3D.</div>
+            <div class="precio">$1650 MXN</div>
+            <button class="btn-agregar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61H19a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                AGREGAR AL CARRITO
+            </button>
+        </div>
+
+        <div class="card" data-nombre="Gorra Mitchell &amp; Ness Street" data-marca="mitchell&amp;ness-street" data-precio="1550">
+            <img class="img-gorra" src="./CAPMUCH_files/WhatsApp Image 2025-12-01 at 12.54.01 PM (1).jpeg" alt="Mitchell &amp; Ness Street" onerror="fallbackImg(this,&#39;https://i.imgur.com/0RzV4iM.jpeg&#39;)">
+            <div class="titulo-gorra">Gorra Mitchell &amp; Ness Street</div>
+            <div class="descripcion">Diseño urbano, visera plana y edición especial NBA Champions.</div>
+            <div class="precio">$1550 MXN</div>
+            <button class="btn-agregar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61H19a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                AGREGAR AL CARRITO
+            </button>
+        </div>
+
+        <!-- Productos extra (img pública) -->
+        <div class="card" data-nombre="New Era Yankees" data-marca="newera" data-precio="1450">
+            <img class="img-gorra" src="./CAPMUCH_files/OIP.webp" alt="New Era">
+            <div class="titulo-gorra">New Era Yankees</div>
+            <div class="descripcion">Clásica, ajuste cómodo y logo bordado.</div>
+            <div class="precio">$1450 MXN</div>
+            <button class="btn-agregar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61H19a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                AGREGAR AL CARRITO
+            </button>
+        </div>
+
+        <div class="card" data-nombre="Supreme Box Logo" data-marca="supreme" data-precio="2200">
+            <img class="img-gorra" src="./CAPMUCH_files/D_NQ_NP_938172-MLM53474242647_012023-O.webp" alt="Supreme">
+            <div class="titulo-gorra">Supreme Box Logo</div>
+            <div class="descripcion">Edición urbana, popular en streetwear.</div>
+            <div class="precio">$2200 MXN</div>
+            <button class="btn-agregar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61H19a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                AGREGAR AL CARRITO
+            </button>
+        </div>
+
+    </div>
+
+    <!-- MAPA INTERACTIVO + TEXTO (casi al final) -->
+    <div class="map-wrap">
+        <div class="map-img">
+            <!-- si prefieres usar la imagen del mapa que subiste, reemplaza la src con la ruta correcta -->
+            <img src="./CAPMUCH_files/890aa42f-251f-4167-aaf0-f3b9a380128c.jpeg" alt="Mapa de sucursales">
+        </div>
+        <div class="map-text">
+            <h2>DESCUBRE NUESTRAS <br><span style="font-size:22px; font-weight:900;">MÁS DE 25 UBICACIONES</span></h2>
+            <p>A nivel nacional. Usa el buscador o haz clic en las marcas para filtrar sucursales cercanas.</p>
+            <div class="map-actions">
+                <a href="file:///G:/ultimo%20intento/MACHSCAPS.HTML#" id="btn-encontrar">ENCUENTRA TU TIENDA</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIDEO -->
+    <div class="video-wrap">
+        <h2>MODELOS NBA MITCHELL &amp; NESS</h2>
+        
+<iframe width="560" height="315" src="./CAPMUCH_files/HrpYgePAVco.html" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
+    </div>
+    <!-- MARCAS -->
+    <div class="marcas">
+        <h2>MARCAS DESTACADAS</h2>
+        <p class="azul">Jordan: estilo deportivo y elegante.</p>
+        <p class="rojo">Mitchell &amp; Ness: colecciones clásicas de NBA.</p>
+        <p class="verde">Ediciones limitadas disponibles todo el año.</p>
+    </div>
+
+      <!-- CARRITO -->
+    <div class="carrito-pago" id="carrito-pago">
+        <div class="carrito-header">
+            <h2>🛒 TU CARRITO DE COMPRAS</h2>
+        </div>
+
+        <div id="carrito-lista" class="carrito-items"><div class="carrito-empty">El carrito está vacío. Selecciona alguna gorra!</div></div>
+
+        <div class="carrito-footer">
+            <div class="datos-pago">
+                <h3>Datos para el pago</h3>
+                <input id="input-nombre" type="text" placeholder="Tu nombre completo">
+                <input id="input-tarjeta" type="text" placeholder="Número de tarjeta (solo números)">
+                <input id="input-fecha" type="text" placeholder="Fecha de vencimiento (MM/AA)">
+                <input id="input-cvv" type="text" placeholder="Código CVV">
+            </div>
+
+            <div class="resumen-pago">
+                <div class="total-label">Total:</div>
+                <div id="total-pago" class="total-amount">$0 MXN</div>
+
+                <div class="acciones-principales" style="justify-content:flex-end;">
+                    <button id="btn-vaciar" class="btn-vaciar">
+                        <!-- icono papelera -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>
+                        VACIAR CARRITO
+                    </button>
+                    <button id="btn-comprar" class="btn-comprar">
+                        <!-- icono tarjeta -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                        COMPLETAR PAGO
+                    </button>
+                </div>¡Compra realizada con éxito! Gracias 🎉</div>
+            </div>
+        </div>
+    
+
+    <!-- Modal confirmación -->
+    <div id="modal" class="modal-overlay" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <h3 id="modal-title">Confirmar compra</h3>
+            <div class="lista-resumen" id="lista-resumen"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                <div style="color:#ddd;">Total:</div>
+                <div id="modal-total" style="color:#ffcc00; font-weight:800;"></div>
+            </div>
+            <div class="acciones" style="margin-top:12px;">
+                <button class="btn btn-cancel" id="modal-cancel">Cancelar</button>
+                <button class="btn btn-confirm" id="modal-confirm">Confirmar pago</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat asistente simple -->
+    <div class="chat-panel" id="chat-panel" aria-hidden="true">
+        <div class="messages" id="chat-messages"></div>
+        <input id="chat-input" placeholder="Escribe tu consulta... (ej. ¿Dónde están en CDMX?)">
+    </div>
+
+    <footer>
+        <h3>Integrantes del Proyecto</h3>
+        <p>
+            Corona Flores Bayron Jose<br>
+            González Hernández Jesicca Marlene<br>
+            Hernández Ferrusca Angel Santiago<br>
+            Martin Sanabria Jose Emanuel<br>
+            Mota Salinas Lander Gael
+        </p>
+        <p style="margin-top:10px; color:#888;">© <span id="anio">2025</span> Tienda de Gorras Premium</p>
+    </footer>
+
+    <script>
+        // año dinámico
+        document.getElementById("anio").textContent = new Date().getFullYear();
+
+        // fallback: si una imagen local no carga, reemplazar por una pública
+        function fallbackImg(imgEl, fallbackUrl) {
+            try {
+                if (imgEl && imgEl.src !== fallbackUrl) {
+                    imgEl.src = fallbackUrl;
+                }
+          } catch (e) { console.warn(e); }
+        }
+
+        /* MÚSICA: mute / unmute + play/pause */
+        const musica = document.getElementById("musica");
+        const btnMusica = document.getElementById("btn-musica");
+        const iconMusica = document.getElementById("icon-musica");
+
+        // Inicial: silenciar por defecto (browser-friendly); dejamos audio cargado pero muted true.
+        try { musica.muted = true; } catch(e){}
+
+        function updateMusicaIcon() {
+            if (musica.paused) {
+                // show paused icon
+                btnMusica.style.background = '#ff4d4d';
+                btnMusica.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 9v6h4l5 5V4l-5 5H9z"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>`;
+            } else if (musica.muted) {
+                btnMusica.style.background = '#ff4d4d';
+                btnMusica.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 9v6h4l5 5V4l-5 5H9z"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>`;
+            } else {
+                btnMusica.style.background = '#45b649';
+                btnMusica.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 9v6h4l5 5V4l-5 5H9z"></path>
+                    </svg>`;
+            }
+        }
+        updateMusicaIcon();
+
+        // click sencillo: alterna mute/unmute and play if unmuted; click pausa/despausa
+        btnMusica.addEventListener('click', async (e) => {
+            if (e.shiftKey) {
+                // play / pause
+                if (musica.paused) {
+                    try { await musica.play(); } catch(e){}
+                } else {
+                    musica.pause();
+                }
+            } else {
+                // mute toggle; if muted -> unmute and try play
+                musica.muted = !musica.muted;
+                if (!musica.muted && musica.paused) {
+                    try { await musica.play(); } catch(e){}
+                }
+            }
+            updateMusicaIcon();
+        });
+
+        /* MENU hamburguesa */
+        const menuToggle = document.getElementById('menu-toggle');
+        const menuPanel = document.getElementById('menu-panel');
+        menuToggle.addEventListener('click', () => {
+            const open = menuPanel.style.display === 'block';
+            menuPanel.style.display = open ? 'none' : 'block';
+            menuToggle.setAttribute('aria-expanded', !open);
+        });
+        document.addEventListener('click', (e) => {
+            if (!menuPanel.contains(e.target) && e.target !== menuToggle) {
+                menuPanel.style.display = 'none';
+                menuToggle.setAttribute('aria-expanded', false);
+            }
+        });
+
+        /* FILTRO y BÚSQUEDA */
+        const inputBusqueda = document.getElementById("busqueda");
+        const selectMarca = document.getElementById("filtro-marca");
+        const btnReset = document.getElementById("btn-reset");
+        const gridProductos = document.getElementById("grid-productos");
+
+        function filtrarProductos() {
+            const texto = inputBusqueda.value.trim().toLowerCase();
+            const marca = selectMarca.value;
+            const cards = gridProductos.querySelectorAll(".card");
+
+            cards.forEach(card => {
+                const nombre = card.dataset.nombre.toLowerCase();
+                const marcaCard = card.dataset.marca.toLowerCase();
+
+                const pasaTexto = nombre.includes(texto);
+                const pasaMarca = (marca === "todas") || (marcaCard === marca);
+
+                if (pasaTexto && pasaMarca) {
+                    card.style.display = "";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
+        inputBusqueda.addEventListener("input", filtrarProductos);
+        selectMarca.addEventListener("change", filtrarProductos);
+        btnReset.addEventListener("click", () => {
+            inputBusqueda.value = "";
+            selectMarca.value = "todas";
+            filtrarProductos();
+        });
+
+        /* CARRITO COMPLETO (interactivo) */
+        let carrito = [];
+        const carritoLista = document.getElementById("carrito-lista");
+        const totalPagoEl = document.getElementById("total-pago");
+        const btnVaciar = document.getElementById("btn-vaciar");
+        const btnComprar = document.getElementById("btn-comprar");
+        const mensajeExito = document.getElementById("mensaje-exito");
+
+        // actualizar vista
+        function actualizarCarrito() {
+            carritoLista.innerHTML = "";
+            if (carrito.length === 0) {
+                carritoLista.innerHTML = '<div class="carrito-empty">El carrito está vacío. Selecciona alguna gorra!</div>';
+            } else {
+                carrito.forEach((item, index) => {
+                    const itemDiv = document.createElement("div");
+                    itemDiv.className = "carrito-item";
+
+                    itemDiv.innerHTML = `
+                        <div>
+                            <div class="nombre">${item.nombre}</div>
+                            <div style="font-size:12px;color:#999;">Marca: ${item.marca}</div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div class="precio">$${item.precio} MXN</div>
+                            <button class="mini-btn" data-index="${index}" data-action="menos" title="Disminuir">-</button>
+                            <span style="min-width:22px; display:inline-block; text-align:center;">${item.cantidad}</span>
+                            <button class="mini-btn" data-index="${index}" data-action="mas" title="Aumentar">+</button>
+                            <button class="mini-btn" data-index="${index}" data-action="eliminar" title="Eliminar">X</button>
+                        </div>
+                    `;
+                    carritoLista.appendChild(itemDiv);
+                });
+            }
+
+            const total = carrito.reduce((s, it) => s + it.precio * it.cantidad, 0);
+            totalPagoEl.textContent = `$${total} MXN`;
+        }
+
+        // agregar al carrito
+        function agregarAlCarrito(nombre, marca, precio) {
+            const existente = carrito.find(i => i.nombre === nombre && i.marca === marca);
+            if (existente) {
+                existente.cantidad += 1;
+            } else {
+                carrito.push({ nombre, marca, precio: Number(precio), cantidad: 1 });
+            }
+            actualizarCarrito();
+        }
+
+        // botones agregar
+        document.querySelectorAll(".btn-agregar").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const card = e.target.closest(".card");
+                const nombre = card.dataset.nombre;
+                const marca = card.dataset.marca;
+                const precio = card.dataset.precio;
+                agregarAlCarrito(nombre, marca, precio);
+
+                // feedback visual
+                const original = btn.innerHTML;
+                btn.innerHTML = 'AGREGADO ✓';
+                btn.disabled = true;
+                setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 900);
+            });
+        });
+
+        // delegación para mini botones dentro del carrito
+        carritoLista.addEventListener("click", (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            const action = btn.dataset.action;
+            const index = Number(btn.dataset.index);
+            if (!action) return;
+            if (action === "mas") {
+                carrito[index].cantidad++;
+                actualizarCarrito();
+            } else if (action === "menos") {
+                carrito[index].cantidad--;
+                if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
+                actualizarCarrito();
+            } else if (action === "eliminar") {
+                carrito.splice(index, 1);
+                actualizarCarrito();
+            }
+        });
+
+        // vaciar carrito
+        btnVaciar.addEventListener("click", () => {
+            if (carrito.length === 0) return;
+            if (!confirm("¿Seguro que quieres vaciar el carrito?")) return;
+            carrito = [];
+            actualizarCarrito();
+        });
+
+        /* MODAL de confirmación antes de pagar */
+        const modal = document.getElementById("modal");
+        const listaResumen = document.getElementById("lista-resumen");
+        const modalTotal = document.getElementById("modal-total");
+        const modalCancel = document.getElementById("modal-cancel");
+        const modalConfirm = document.getElementById("modal-confirm");
+
+        function abrirModalConfirm() {
+            // si carrito vacío, no abrir
+            if (carrito.length === 0) { alert("Tu carrito está vacío."); return; }
+
+            // llenar resumen
+            listaResumen.innerHTML = "";
+            carrito.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "fila";
+                div.innerHTML = `<div style=\"color:#fff\">${item.nombre} <small style=\"color:#999\">(${item.marca}) x${item.cantidad}</small></div><div style=\"color:#ffcc00\">$${item.precio * item.cantidad}</div>`;
+                listaResumen.appendChild(div);
+            });
+            const total = carrito.reduce((s, it) => s + it.precio * it.cantidad, 0);
+            modalTotal.textContent = `$${total} MXN`;
+
+            modal.style.display = "flex";
+            modal.setAttribute("aria-hidden","false");
+        }
+
+        modalCancel.addEventListener("click", () => {
+            modal.style.display = "none";
+            modal.setAttribute("aria-hidden","true");
+        });
+
+        modalConfirm.addEventListener("click", () => {
+            // validar inputs
+            const nombre = document.getElementById("input-nombre").value.trim();
+            const tarjeta = document.getElementById("input-tarjeta").value.trim();
+            const fecha = document.getElementById("input-fecha").value.trim();
+            const cvv = document.getElementById("input-cvv").value.trim();
+
+            if (!nombre || !tarjeta || !fecha || !cvv) {
+                alert("Por favor completa todos los datos para el pago antes de confirmar.");
+                return;
+            }
+
+            // simulación de pago: cerrar modal, mostrar éxito, limpiar carrito
+            modal.style.display = "none";
+            modal.setAttribute("aria-hidden","true");
+
+            mensajeExito.style.display = "block";
+            setTimeout(() => { mensajeExito.style.display = "none"; }, 3500);
+
+            carrito = [];
+            actualizarCarrito();
+
+            // limpiar campos
+            document.getElementById("input-nombre").value = "";
+            document.getElementById("input-tarjeta").value = "";
+            document.getElementById("input-fecha").value = "";
+            document.getElementById("input-cvv").value = "";
+        });
+
+        // abrir modal cuando el usuario hace click en completar pago
+        btnComprar.addEventListener("click", abrirModalConfirm);
+
+        // inicial
+        actualizarCarrito();
+
+        /* BOTON ENCONTRAR SUCURSAL - simple ejemplo interactivo */
+        document.getElementById('btn-encontrar').addEventListener('click', (e) => {
+            e.preventDefault();
+            const name = prompt('Ingresa tu ciudad o colonia para buscar sucursal (ej. Guadalajara)');
+            if (!name) return;
+            alert('Buscando sucursales cercanas a: ' + name + '. (Esto es una demo interactiva)');
+        });
+
+        /* ASISTENTE VIRTUAL - chat simple */
+        const btnAsistente = document.getElementById('btn-asistente');
+        const chatPanel = document.getElementById('chat-panel');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+
+        btnAsistente.addEventListener('click', () => {
+            const open = chatPanel.style.display === 'block';
+            chatPanel.style.display = open ? 'none' : 'block';
+            chatPanel.setAttribute('aria-hidden', open ? 'true' : 'false');
+            if (!open) { chatMessages.innerHTML = '<div style="color:#ffcc00;font-weight:800;margin-bottom:8px;">Asistente</div>'; }
+        });
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const text = chatInput.value.trim();
+                if (!text) return;
+                const userDiv = document.createElement('div'); userDiv.style.color = '#ddd'; userDiv.textContent = 'Tú: ' + text; chatMessages.appendChild(userDiv);
+                chatInput.value = '';
+                // respuesta simulada
+                setTimeout(() => {
+                    const botDiv = document.createElement('div'); botDiv.style.color = '#ffcc00'; botDiv.textContent = 'Bot: Gracias, un representante te contactará por WhatsApp o revisa nuestras sucursales en el mapa.'; chatMessages.appendChild(botDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 700);
+            }
+        });
+
+    </script>
+
+
+</body></html>
